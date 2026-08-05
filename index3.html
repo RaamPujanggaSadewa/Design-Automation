@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Onboarding</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Reddit+Sans:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --text-primary:#1f2a37;
+    --text-secondary:#6b7280;
+    --text-muted:#9ca3af;
+    --bg-swipe:#f9fafb;
+    --bg-icon:#f2f4f5;
+    --grabber:#d1d5db;
+    --overlay:rgba(0,0,0,0.5);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    margin:0;
+    font-family:'Reddit Sans',sans-serif;
+    background:#e5e7eb;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:100dvh;
+    overflow:hidden;
+  }
+
+  .phone{
+    position:relative;
+    width:100%;
+    max-width:430px;
+    height:100dvh;
+    max-height:932px;
+    background:#ffffff;
+    overflow:hidden;
+    box-shadow:0 30px 60px rgba(0,0,0,.25);
+  }
+  @media (min-width:460px){
+    .phone{ border-radius:40px; height:min(100dvh,900px); }
+  }
+
+  .overlay{
+    position:absolute;
+    inset:0;
+    background:var(--overlay);
+  }
+
+  /* ---------- bottom sheet ---------- */
+  .sheet{
+    position:absolute;
+    left:0;
+    right:0;
+    bottom:0;
+    background:#ffffff;
+    border-radius:20px 20px 0 0;
+    display:flex;
+    flex-direction:column;
+    padding:0 16px 28px;
+    transition:transform .45s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+  }
+  .sheet.is-leaving{
+    transform:translateY(12px);
+    opacity:0;
+    pointer-events:none;
+  }
+  .sheet.is-hidden{
+    transform:translateY(24px);
+    opacity:0;
+    pointer-events:none;
+  }
+  .sheet.is-entering{
+    animation:sheet-in .45s cubic-bezier(.4,0,.2,1);
+  }
+  @keyframes sheet-in{
+    from{ transform:translateY(24px); opacity:0; }
+    to{ transform:translateY(0); opacity:1; }
+  }
+
+  .grabber-row{ display:flex; justify-content:center; padding:12px 0; }
+  .grabber{ width:120px; height:8px; border-radius:100px; background:var(--grabber); }
+
+  .sheet-title{
+    margin:0 0 20px;
+    font-size:24px;
+    font-weight:700;
+    line-height:1.3;
+    letter-spacing:.02em;
+    color:var(--text-primary);
+  }
+
+  /* ---------- Helper (guideline) view ---------- */
+  .guide-panel{
+    position:relative;
+    background:var(--bg-swipe);
+    border-radius:16px;
+    padding:36px 20px 84px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+  }
+  .guide-side{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:16px;
+    flex:1;
+  }
+  .guide-side img{ width:64px; height:64px; }
+  .guide-side p{
+    margin:0;
+    font-size:14px;
+    line-height:1.5;
+    color:var(--text-secondary);
+    text-align:center;
+  }
+  .guide-actions{
+    position:absolute;
+    left:50%;
+    bottom:0;
+    transform:translate(-50%, 50%);
+    display:flex;
+    gap:32px;
+    opacity:.55;
+  }
+  .guide-actions img{ width:64px; height:64px; }
+
+  /* ---------- Onboarding (swipe deck) view ---------- */
+  .deck-wrap{
+    position:relative;
+    height:360px;
+    margin-top:4px;
+  }
+  .deck{
+    position:relative;
+    width:100%;
+    height:100%;
+  }
+  .card{
+    position:absolute;
+    inset:0;
+    background:#fff;
+    border-radius:16px;
+    box-shadow:0 10px 30px rgba(31,42,55,.12);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    transform-origin:bottom center;
+    transition:transform .35s cubic-bezier(.4,0,.2,1), opacity .35s ease;
+    will-change:transform;
+  }
+  .card.dragging{ transition:none; }
+  .card .photo{
+    flex:1;
+    min-height:0;
+    background-size:cover;
+    background-position:center;
+    border-radius:16px 16px 0 0;
+  }
+  .card .info{ padding:16px 16px 0; }
+  .card .brand{
+    margin:0;
+    font-size:24px;
+    font-weight:600;
+    color:var(--text-primary);
+    line-height:1.5;
+  }
+  .card .item{
+    margin:2px 0 0;
+    font-size:18px;
+    font-weight:400;
+    color:var(--text-secondary);
+    line-height:1.5;
+  }
+  .card .price{
+    margin:4px 0 0;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text-primary);
+    line-height:1.5;
+  }
+  .stamp{
+    position:absolute;
+    top:28px;
+    padding:6px 14px;
+    border:3px solid currentColor;
+    border-radius:8px;
+    font-size:22px;
+    font-weight:800;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    opacity:0;
+    transition:opacity .15s ease;
+  }
+  .stamp.like{ right:20px; color:#fb5679; transform:rotate(14deg); }
+  .stamp.nope{ left:20px; color:#f2542d; transform:rotate(-14deg); }
+
+  .action-buttons{
+    display:flex;
+    justify-content:center;
+    gap:32px;
+    margin-top:-32px;
+    position:relative;
+    z-index:20;
+  }
+  .action-buttons button{
+    border:none;
+    background:none;
+    padding:0;
+    cursor:pointer;
+    line-height:0;
+  }
+  .action-buttons img{
+    width:64px;
+    height:64px;
+    filter:drop-shadow(0 6px 14px rgba(31,42,55,.18));
+    transition:transform .15s ease;
+  }
+  .action-buttons button:active img{ transform:scale(.9); }
+</style>
+</head>
+<body>
+
+<div class="phone">
+  <div class="overlay"></div>
+
+  <!-- ===== View 1: Onboarding Helper (guideline, shown for 5s) ===== -->
+  <section id="helperSheet" class="sheet">
+    <div class="grabber-row"><div class="grabber"></div></div>
+    <h2 class="sheet-title">Choose what you like ❤️</h2>
+
+    <div class="guide-panel">
+      <div class="guide-side">
+        <img src="assets/hand-swipe-left.png" alt="Swipe left gesture">
+        <p>Swipe left if you dislike the item</p>
+      </div>
+      <div class="guide-side">
+        <img src="assets/hand-swipe-right.png" alt="Swipe right gesture">
+        <p>Swipe right if you like the item</p>
+      </div>
+      <div class="guide-actions">
+        <img src="assets/btn-dislike.png" alt="Dislike">
+        <img src="assets/btn-like.png" alt="Like">
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== View 2: Onboarding (interactive swipe deck) ===== -->
+  <section id="onboardingSheet" class="sheet is-hidden">
+    <div class="grabber-row"><div class="grabber"></div></div>
+    <h2 class="sheet-title">Choose what you like ❤️</h2>
+
+    <div class="deck-wrap">
+      <div class="deck" id="deck"></div>
+    </div>
+
+    <div class="action-buttons">
+      <button type="button" id="dislikeBtn" aria-label="Dislike">
+        <img src="assets/btn-dislike.png" alt="">
+      </button>
+      <button type="button" id="likeBtn" aria-label="Like">
+        <img src="assets/btn-like.png" alt="">
+      </button>
+    </div>
+  </section>
+</div>
+
+<script>
+  const products = [
+    { brand:"Audio Technica", item:"ATH-M50x Wired", price:"Rp1.900.000", img:"assets/card-audiotechnica.png" },
+    { brand:"The Body Shop", item:"Full Orange Blossom Edp 75ml", price:"Rp1.290.000", img:"assets/card-bodyshop.png" },
+    { brand:"H&M", item:"Cotton twill cap", price:"Rp219.000", img:"assets/card-hm.png" },
+    { brand:"Vans", item:"Classic Slip-On Summer Linen", price:"Rp890.000", img:"assets/card-vans.png" },
+    { brand:"ZMNow", item:"Rose moss scarf kerudung segi 4", price:"Rp200.000", img:"assets/card-zmnow.png" },
+  ];
+
+  const deckEl = document.getElementById('deck');
+  const helperSheet = document.getElementById('helperSheet');
+  const onboardingSheet = document.getElementById('onboardingSheet');
+
+  let queue = [...products];
+
+  function renderDeck(){
+    deckEl.innerHTML = '';
+    queue.slice(0, 3).reverse().forEach((product, i) => {
+      const depth = queue.slice(0, 3).length - 1 - i; // 0 = top card
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.style.zIndex = 10 - depth;
+      card.style.transform = `scale(${1 - depth * 0.045}) translateY(${depth * 12}px)`;
+      card.style.opacity = depth === 2 ? 0.6 : 1;
+      card.innerHTML = `
+        <div class="stamp like">LIKE</div>
+        <div class="stamp nope">NOPE</div>
+        <div class="photo" style="background-image:url('${product.img}')"></div>
+        <div class="info">
+          <p class="brand">${product.brand}</p>
+          <p class="item">${product.item}</p>
+          <p class="price">${product.price}</p>
+        </div>`;
+      deckEl.appendChild(card);
+      if(depth === 0) bindDrag(card);
+    });
+  }
+
+  function bindDrag(card){
+    const likeStamp = card.querySelector('.stamp.like');
+    const nopeStamp = card.querySelector('.stamp.nope');
+    let startX = 0, startY = 0, dx = 0, dragging = false;
+
+    const onDown = (e) => {
+      dragging = true;
+      card.classList.add('dragging');
+      const p = e.touches ? e.touches[0] : e;
+      startX = p.clientX; startY = p.clientY;
+      window.addEventListener('pointermove', onMove);
+      window.addEventListener('pointerup', onUp);
+    };
+    const onMove = (e) => {
+      if(!dragging) return;
+      const p = e.touches ? e.touches[0] : e;
+      dx = p.clientX - startX;
+      const dy = p.clientY - startY;
+      const rotate = dx / 14;
+      card.style.transform = `translate(${dx}px, ${dy}px) rotate(${rotate}deg)`;
+      likeStamp.style.opacity = dx > 30 ? Math.min(dx / 100, 1) : 0;
+      nopeStamp.style.opacity = dx < -30 ? Math.min(-dx / 100, 1) : 0;
+    };
+    const onUp = () => {
+      dragging = false;
+      card.classList.remove('dragging');
+      window.removeEventListener('pointermove', onMove);
+      window.removeEventListener('pointerup', onUp);
+      const threshold = 110;
+      if(Math.abs(dx) > threshold){
+        resolveSwipe(dx > 0 ? 1 : -1);
+      } else {
+        card.style.transform = '';
+        likeStamp.style.opacity = 0;
+        nopeStamp.style.opacity = 0;
+      }
+      dx = 0;
+    };
+    card.addEventListener('pointerdown', onDown);
+  }
+
+  function resolveSwipe(direction){
+    const topCard = deckEl.querySelector('.card:last-child');
+    if(!topCard) return;
+    topCard.style.transition = 'transform .4s ease, opacity .4s ease';
+    topCard.style.transform = `translate(${direction * 500}px, -40px) rotate(${direction * 26}deg)`;
+    topCard.style.opacity = '0';
+    const swiped = queue.shift();
+    queue.push(swiped); // loop the deck for continuous demo
+    setTimeout(renderDeck, 380);
+  }
+
+  document.getElementById('likeBtn').addEventListener('click', () => resolveSwipe(1));
+  document.getElementById('dislikeBtn').addEventListener('click', () => resolveSwipe(-1));
+
+  renderDeck();
+
+  // Auto-advance from the guideline (Onboarding Helper) to the interactive deck after 5s
+  setTimeout(() => {
+    helperSheet.classList.add('is-leaving');
+    onboardingSheet.classList.remove('is-hidden');
+    onboardingSheet.classList.add('is-entering');
+  }, 5000);
+</script>
+
+</body>
+</html>

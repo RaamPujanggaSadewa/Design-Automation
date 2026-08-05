@@ -1,0 +1,713 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NomadNest 95 — Stay With Locals. Travel Like You Belong.</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🏡</text></svg>" />
+
+<!-- Windows 95/98 chrome + bitmap font, per design2.md ("Windows Classic") -->
+<link rel="stylesheet" href="https://unpkg.com/98.css@0.1.21/dist/98.css" />
+
+<style>
+  /* ============ DESIGN TOKENS (from design2.md) ============ */
+  :root{
+    --color-accent:   #008080; /* desktop background */
+    --color-primary:  #C0C0C0; /* window / menu background */
+    --color-secondary:#808080; /* shadow edges */
+    --color-tertiary: #000080; /* active selection */
+    --color-neutral:  #FFFFFF; /* highlights */
+    --color-text:     #000000; /* primary text */
+
+    --border-width: 2px;       /* border.width: outset 2px */
+    --radius: 0px;              /* rounded.sm / rounded.md */
+
+    --sp-xs: 2px;
+    --sp-sm: 4px;
+    --sp-md: 8px;
+    --sp-lg: 16px;
+
+    --font-pixel: "Pixelated MS Sans Serif", "MS Sans Serif", Tahoma, Arial, sans-serif;
+
+    /* reusable bevel recipes (outset / inset), 2px, matching design2.md border spec */
+    --bevel-out: inset -1px -1px #0a0a0a, inset 1px 1px #fff, inset -2px -2px grey, inset 2px 2px #dfdfdf;
+    --bevel-in:  inset -1px -1px #fff, inset 1px 1px grey, inset -2px -2px #dfdfdf, inset 2px 2px #0a0a0a;
+  }
+
+  *{ box-sizing:border-box; }
+  html,body{ height:100%; margin:0; padding:0; overflow:hidden; }
+  body, p, div, span, section, td, th, li, a, h1, h2, h3, b, i, u {
+    font-family: var(--font-pixel);
+  }
+  body{
+    background: var(--color-accent);
+    color: var(--color-text);
+    font-size: 11px; /* ~8pt bitmap rendering per token */
+    -webkit-font-smoothing: none;
+  }
+  h1{ font-size:18px; margin:0 0 var(--sp-md); } /* typography.h1 */
+  a{ cursor:pointer; }
+  img,svg{ display:block; max-width:100%; }
+  ::selection{ background:var(--color-tertiary); color:#fff; }
+
+  .text-muted{ color: var(--color-secondary); }
+  .center{ text-align:center; }
+
+  /* ============ DESKTOP ============ */
+  .desktop{
+    position:relative;
+    height:100%;
+    padding-bottom:32px; /* leave room for taskbar */
+    overflow:hidden;
+  }
+
+  .desktop-icons{
+    position:absolute; top:var(--sp-lg); left:var(--sp-lg);
+    display:flex; flex-direction:column; gap:20px;
+    z-index:1;
+  }
+  .desktop-icon{
+    display:flex; flex-direction:column; align-items:center;
+    width:76px; gap:4px; cursor:pointer; user-select:none;
+  }
+  .desktop-icon .glyph{ font-size:32px; line-height:1; filter:drop-shadow(1px 1px 0 rgba(0,0,0,.5)); }
+  .desktop-icon .label{
+    color:#fff; font-size:11px; text-align:center; text-shadow:1px 1px 1px #000;
+    padding:1px 3px;
+  }
+  .desktop-icon.selected .label{ background:var(--color-tertiary); outline:1px dotted #fff; }
+
+  /* ============ APP WINDOW ============ */
+  .app-window{
+    width:min(1180px, 96vw);
+    height:calc(100% - 24px);
+    margin:12px auto 0;
+    display:flex; flex-direction:column;
+    position:relative; z-index:2;
+  }
+
+  .menu-bar{
+    display:flex; gap:2px; padding:2px var(--sp-sm);
+    background:var(--color-primary);
+    border-bottom:1px solid var(--color-secondary);
+    position:relative;
+  }
+  .menu-item{
+    position:relative; padding:2px 8px; cursor:pointer; user-select:none;
+  }
+  .menu-item:hover{ background:var(--color-tertiary); color:#fff; }
+  .menu-item .dropdown{
+    display:none; position:absolute; top:100%; left:0; min-width:180px;
+    background:var(--color-primary); box-shadow:var(--bevel-out);
+    padding:2px; z-index:500;
+  }
+  .menu-item:hover .dropdown{ display:block; }
+  .dropdown a{
+    display:block; padding:4px 10px; color:var(--color-text); text-decoration:none; font-size:11px;
+  }
+  .dropdown a:hover{ background:var(--color-tertiary); color:#fff; }
+  .dropdown hr{ margin:2px 0; border:none; border-top:1px solid var(--color-secondary); border-bottom:1px solid #fff; }
+
+  .toolbar{
+    background:var(--color-primary);
+    border-bottom:1px solid var(--color-secondary);
+    padding:var(--sp-sm);
+    display:flex; flex-direction:column; gap:var(--sp-sm);
+  }
+  .toolbar-row{ display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+  .tool-btn{
+    min-width:30px !important; min-height:28px !important;
+    padding:0 6px !important; font-size:15px;
+    color:#000 !important; text-shadow:none !important;
+    display:inline-flex; align-items:center; justify-content:center;
+  }
+  .tool-sep{ width:2px; height:24px; box-shadow:var(--bevel-in); margin:0 2px; }
+  .address-row{ display:flex; align-items:center; gap:8px; }
+  .address-row label{ font-weight:700; white-space:nowrap; }
+  .address-row input[type="text"]{ flex:1; }
+  .address-row button{ color:#000 !important; text-shadow:none !important; min-width:56px !important; }
+
+  /* ============ CONTENT PANE ============ */
+  .app-body{
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    background:var(--color-neutral);
+    box-shadow:var(--bevel-in);
+    margin:0; padding:0;
+  }
+  .page{ padding:var(--sp-lg); display:flex; flex-direction:column; gap:24px; }
+  .win-section{ display:flex; flex-direction:column; gap:10px; }
+  .section-title{ display:flex; align-items:center; gap:8px; }
+  .section-title h2{ font-size:14px; font-weight:700; margin:0; }
+  .section-title .rule{ flex:1; border-top:1px solid var(--color-secondary); border-bottom:1px solid #fff; }
+
+  fieldset{ background:var(--color-primary); }
+  legend{ font-weight:700; }
+
+  /* ============ HERO ============ */
+  .hero-eyebrow{
+    display:inline-block; background:var(--color-primary); box-shadow:var(--bevel-out);
+    padding:4px 12px; font-size:11px; margin:0 auto 10px;
+  }
+  .hero p.lede{ max-width:520px; margin:0 auto 14px; }
+  .hero .btn-row{ display:flex; gap:var(--sp-md); justify-content:center; flex-wrap:wrap; }
+
+  .stats-bar{ margin-top:6px; }
+  .stats-bar .status-bar-field{ text-align:center; font-weight:700; }
+
+  /* ============ SEARCH ============ */
+  .search-fields{ display:flex; gap:var(--sp-lg); flex-wrap:wrap; align-items:flex-end; }
+  .search-fields .field-row-stacked{ flex:1; min-width:150px; }
+  .search-fields label{ font-size:11px; }
+  .search-fields input, .search-fields select{ width:100%; }
+
+  /* ============ HOSTS TABLE ============ */
+  .list-status{ display:flex; justify-content:space-between; margin-top:4px; }
+  table.host-table{ width:100%; }
+  table.host-table td, table.host-table th{ white-space:normal; }
+  table.host-table td:first-child{ text-align:center; font-size:16px; width:36px; }
+
+  /* ============ HOW IT WORKS ============ */
+  .steps-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--sp-lg); }
+  .wizard-step .step-icon{ font-size:28px; margin-bottom:6px; }
+  .wizard-step p{ margin:0; }
+
+  /* ============ SAFETY ============ */
+  .safety-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:var(--sp-lg); align-items:start; }
+  .safety-grid .field-row{ align-items:flex-start; }
+  .rating-huge{ font-size:40px; font-weight:700; line-height:1; }
+  .mini-badge{
+    display:inline-block; background:var(--color-primary); box-shadow:var(--bevel-out);
+    padding:3px 8px; font-size:11px;
+  }
+  .badge-row{ display:flex; gap:6px; justify-content:center; flex-wrap:wrap; margin-top:10px; }
+
+  /* ============ TESTIMONIALS ============ */
+  .msgbox-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:var(--sp-lg); }
+  .msgbox .window-body{ display:flex; flex-direction:column; gap:10px; }
+  .msgbox .msg-row{ display:flex; gap:10px; }
+  .msgbox .msg-icon{ font-size:28px; flex:none; }
+  .msgbox .msg-author{ margin-top:6px; }
+  .msgbox .msg-actions{ display:flex; justify-content:flex-end; }
+
+  /* ============ FOOTER / SITE MAP ============ */
+  .sitemap-grid{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--sp-lg); }
+  .sitemap-grid ul{ list-style:none; margin:6px 0 0; padding:0; }
+  .sitemap-grid li{ padding:2px 0; }
+  .legal-line{ margin-top:10px; }
+
+  @media (max-width:820px){
+    .steps-grid, .safety-grid, .msgbox-grid, .sitemap-grid{ grid-template-columns:1fr; }
+    .desktop-icons{ display:none; }
+    .app-window{ width:100vw; margin-top:0; height:100%; }
+  }
+
+  /* ============ STATUS BAR ============ */
+  .app-status .status-bar-field{ font-size:11px; }
+
+  /* ============ START MENU ============ */
+  .start-menu{
+    position:fixed; left:2px; bottom:32px; width:280px;
+    background:var(--color-primary); box-shadow:var(--bevel-out);
+    display:none; z-index:5000;
+  }
+  .start-menu.open{ display:flex; }
+  .start-menu-sidebar{
+    width:26px; background:linear-gradient(180deg, var(--color-tertiary), #1084d0);
+    display:flex; align-items:flex-end; justify-content:center; padding-bottom:10px;
+  }
+  .start-menu-sidebar span{
+    writing-mode:vertical-rl; transform:rotate(180deg);
+    color:#fff; font-weight:700; font-style:italic; letter-spacing:2px; font-size:15px;
+  }
+  .start-menu-list{ list-style:none; margin:0; padding:4px; flex:1; }
+  .start-menu-list li{
+    padding:6px 10px; display:flex; align-items:center; gap:8px;
+    cursor:pointer; position:relative; user-select:none; font-size:11px;
+  }
+  .start-menu-list li:hover{ background:var(--color-tertiary); color:#fff; }
+  .start-menu-list li a{ color:inherit; text-decoration:none; display:flex; align-items:center; gap:8px; width:100%; }
+  .start-menu-list li.divider{ height:0; border-top:1px solid var(--color-secondary); border-bottom:1px solid #fff; margin:4px 6px; padding:0; }
+  .start-menu-list li.has-submenu .arrow{ margin-left:auto; }
+  .submenu{
+    display:none; position:absolute; left:100%; top:-4px; min-width:190px;
+    background:var(--color-primary); box-shadow:var(--bevel-out); list-style:none; margin:0; padding:4px;
+  }
+  .has-submenu:hover .submenu{ display:block; }
+  .submenu li{ padding:6px 10px; font-size:11px; }
+
+  /* ============ TASKBAR ============ */
+  .taskbar{
+    position:fixed; left:0; right:0; bottom:0; height:32px;
+    background:var(--color-primary); box-shadow:var(--bevel-out);
+    display:flex; align-items:center; gap:6px; padding:2px 4px;
+    z-index:6000;
+  }
+  .start-button{
+    min-width:auto !important; height:26px; padding:2px 10px !important;
+    display:flex; align-items:center; gap:6px; font-weight:700 !important;
+    color:#000 !important; text-shadow:none !important;
+  }
+  .start-button.active{ box-shadow:var(--bevel-in) !important; }
+  .taskbar-sep{ width:2px; height:24px; box-shadow:var(--bevel-in); }
+  .task-button{
+    height:26px; min-width:170px !important; text-align:left; padding:2px 8px !important;
+    display:flex; align-items:center; gap:6px; color:#000 !important; text-shadow:none !important;
+  }
+  .task-button.active{ box-shadow:var(--bevel-in) !important; }
+  .tray{
+    margin-left:auto; display:flex; align-items:center; gap:10px;
+    box-shadow:var(--bevel-in); background:var(--color-primary);
+    height:22px; padding:0 10px; font-size:11px;
+  }
+  .clock{ font-variant-numeric:tabular-nums; }
+</style>
+</head>
+<body>
+
+  <div class="desktop">
+
+    <!-- ============ DESKTOP ICONS ============ -->
+    <div class="desktop-icons">
+      <div class="desktop-icon"><span class="glyph">💻</span><span class="label">My Computer</span></div>
+      <div class="desktop-icon"><span class="glyph">🌐</span><span class="label">Network Neighborhood</span></div>
+      <div class="desktop-icon"><span class="glyph">🗑️</span><span class="label">Recycle Bin</span></div>
+      <div class="desktop-icon selected"><span class="glyph">🏡</span><span class="label">NomadNest 95</span></div>
+    </div>
+
+    <!-- ============ APP WINDOW ============ -->
+    <div class="window app-window" id="app-window">
+
+      <div class="title-bar">
+        <div class="title-bar-text">🏡 NomadNest.exe — Community Travel Explorer</div>
+        <div class="title-bar-controls">
+          <button aria-label="Minimize"></button>
+          <button aria-label="Maximize"></button>
+          <button aria-label="Close"></button>
+        </div>
+      </div>
+
+      <!-- Menu Items + Cascading Submenus (design2.md components) -->
+      <div class="menu-bar">
+        <div class="menu-item"><u>F</u>ile
+          <div class="dropdown">
+            <a href="#hero">New Window</a>
+            <a href="#search">Open Search…</a>
+            <hr>
+            <a href="#">Print…</a>
+            <a href="#">Exit</a>
+          </div>
+        </div>
+        <div class="menu-item"><u>E</u>dit
+          <div class="dropdown">
+            <a href="#">Cut</a><a href="#">Copy</a><a href="#">Paste</a>
+          </div>
+        </div>
+        <div class="menu-item"><u>V</u>iew
+          <div class="dropdown">
+            <a href="#">Toolbar</a><a href="#">Status Bar</a><a href="#">Refresh</a>
+          </div>
+        </div>
+        <div class="menu-item"><u>G</u>o
+          <div class="dropdown">
+            <a href="#hero">Home</a><a href="#hosts">Featured Hosts</a><a href="#how-it-works">How It Works</a>
+          </div>
+        </div>
+        <div class="menu-item">F<u>a</u>vorites
+          <div class="dropdown">
+            <a href="#hero">⭐ Welcome</a>
+            <a href="#search">⭐ Find a Stay</a>
+            <a href="#hosts">⭐ Featured Hosts</a>
+            <a href="#how-it-works">⭐ How It Works</a>
+            <a href="#safety">⭐ Trust &amp; Safety</a>
+            <a href="#stories">⭐ Community Stories</a>
+            <a href="#footer-nav">⭐ Site Map</a>
+          </div>
+        </div>
+        <div class="menu-item"><u>H</u>elp
+          <div class="dropdown">
+            <a href="#">About NomadNest.exe</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <div class="toolbar-row">
+          <button class="tool-btn" title="Back">◀</button>
+          <button class="tool-btn" title="Forward">▶</button>
+          <button class="tool-btn" title="Stop">✕</button>
+          <button class="tool-btn" title="Refresh">🔄</button>
+          <button class="tool-btn" title="Home">🏠</button>
+          <div class="tool-sep"></div>
+          <button class="tool-btn" title="Search">🔍</button>
+          <button class="tool-btn" title="Favorites">⭐</button>
+          <button class="tool-btn" title="Print">🖨️</button>
+        </div>
+        <div class="address-row">
+          <label>Address</label>
+          <input type="text" value="http://www.nomadnest.com/" readonly />
+          <button>Go</button>
+        </div>
+      </div>
+
+      <!-- ============ CONTENT PANE (scrolls) ============ -->
+      <div class="window-body app-body" id="app-body">
+        <div class="page">
+
+          <!-- HERO -->
+          <section class="win-section center" id="hero">
+            <span class="hero-eyebrow">🌍 Trusted by 40,000+ travelers worldwide</span>
+            <h1>Stay with locals. Travel like you belong.</h1>
+            <p class="lede">NomadNest connects you with hosts who open their homes and their culture — authentic, affordable, community-first travel.</p>
+            <div class="btn-row">
+              <button class="default">Explore Hosts</button>
+              <button>Become a Host</button>
+            </div>
+
+            <div class="status-bar stats-bar">
+              <p class="status-bar-field">12,400+ Verified Hosts</p>
+              <p class="status-bar-field">150+ Countries</p>
+              <p class="status-bar-field">4.9★ Average Rating</p>
+              <p class="status-bar-field">🔒 Secure Messaging</p>
+            </div>
+          </section>
+
+          <!-- SEARCH -->
+          <section class="win-section" id="search">
+            <fieldset>
+              <legend>🔍 Find Your Next Stay</legend>
+              <div class="search-fields">
+                <div class="field-row-stacked">
+                  <label for="dest">Destination</label>
+                  <input id="dest" type="text" placeholder="Search destinations" />
+                </div>
+                <div class="field-row-stacked">
+                  <label for="checkin">Check-in</label>
+                  <input id="checkin" type="text" placeholder="Add dates" />
+                </div>
+                <div class="field-row-stacked">
+                  <label for="checkout">Check-out</label>
+                  <input id="checkout" type="text" placeholder="Add dates" />
+                </div>
+                <div class="field-row-stacked">
+                  <label for="guests">Guests</label>
+                  <select id="guests">
+                    <option>1 guest</option>
+                    <option>2 guests</option>
+                    <option>3+ guests</option>
+                  </select>
+                </div>
+                <div class="field-row-stacked">
+                  <label>&nbsp;</label>
+                  <button class="default">Search Hosts</button>
+                </div>
+              </div>
+            </fieldset>
+          </section>
+
+          <!-- FEATURED HOSTS -->
+          <section class="win-section" id="hosts">
+            <div class="section-title"><h2>📁 Featured Hosts in Popular Destinations</h2><div class="rule"></div></div>
+            <div class="sunken-panel">
+              <table class="interactive host-table">
+                <thead>
+                  <tr><th></th><th>Host</th><th>Location</th><th>Rating</th><th>Bio</th></tr>
+                </thead>
+                <tbody>
+                  <tr class="highlighted">
+                    <td>🧑‍🌾</td><td>Ayu &amp; Made</td><td>Ubud, Indonesia</td><td>★ 4.98</td>
+                    <td>"Come learn to cook with us in our family kitchen."</td>
+                  </tr>
+                  <tr>
+                    <td>🧔</td><td>Kwame</td><td>Accra, Ghana</td><td>★ 4.91</td>
+                    <td>"Storyteller, drummer, always up for a walk downtown."</td>
+                  </tr>
+                  <tr>
+                    <td>👩</td><td>Elif</td><td>Fethiye, Türkiye</td><td>★ 4.95</td>
+                    <td>"Rooftop breakfasts overlooking the bay, every morning."</td>
+                  </tr>
+                  <tr>
+                    <td>👩‍🦱</td><td>Sofía</td><td>Oaxaca, Mexico</td><td>★ 4.99</td>
+                    <td>"Weaver, home cook — my door is open for coffee anytime."</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="list-status text-muted">
+              <span>4 object(s)</span>
+              <span>Real homes, real people, real stories.</span>
+            </div>
+          </section>
+
+          <!-- HOW IT WORKS -->
+          <section class="win-section" id="how-it-works">
+            <div class="section-title"><h2>🧙 How NomadNest Works</h2><div class="rule"></div></div>
+            <div class="steps-grid">
+              <fieldset class="wizard-step">
+                <legend>Step 1</legend>
+                <div class="step-icon">🔍</div>
+                <p><b>Search.</b> Browse hosts by destination, dates, and the kind of experience you're looking for.</p>
+              </fieldset>
+              <fieldset class="wizard-step">
+                <legend>Step 2</legend>
+                <div class="step-icon">💬</div>
+                <p><b>Connect.</b> Message hosts directly, ask questions, and get to know each other before you go.</p>
+              </fieldset>
+              <fieldset class="wizard-step">
+                <legend>Step 3</legend>
+                <div class="step-icon">🎒</div>
+                <p><b>Stay.</b> Arrive, settle in, and experience the destination the way a local would.</p>
+              </fieldset>
+            </div>
+          </section>
+
+          <!-- TRUST & SAFETY -->
+          <section class="win-section" id="safety">
+            <div class="section-title"><h2>🛡 Community Trust &amp; Safety</h2><div class="rule"></div></div>
+            <div class="safety-grid">
+              <fieldset>
+                <legend>Verification Checklist</legend>
+                <div class="field-row">
+                  <input type="checkbox" id="c1" checked disabled />
+                  <label for="c1">Government ID verification for every host</label>
+                </div>
+                <div class="field-row">
+                  <input type="checkbox" id="c2" checked disabled />
+                  <label for="c2">Encrypted, in-app messaging — never share personal contacts</label>
+                </div>
+                <div class="field-row">
+                  <input type="checkbox" id="c3" checked disabled />
+                  <label for="c3">Honest, two-way community reviews after every stay</label>
+                </div>
+                <div class="field-row">
+                  <input type="checkbox" id="c4" checked disabled />
+                  <label for="c4">24/7 support team, in every timezone</label>
+                </div>
+              </fieldset>
+
+              <div class="window">
+                <div class="title-bar">
+                  <div class="title-bar-text">Host Rating Properties</div>
+                  <div class="title-bar-controls"><button aria-label="Close"></button></div>
+                </div>
+                <div class="window-body center">
+                  <div class="rating-huge">4.9</div>
+                  <p class="text-muted">Average Host Rating</p>
+                  <div class="badge-row">
+                    <span class="mini-badge">✓ ID Verified</span>
+                    <span class="mini-badge">🛡 Safety Center</span>
+                    <span class="mini-badge">💬 24/7 Support</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- TESTIMONIALS -->
+          <section class="win-section" id="stories">
+            <div class="section-title"><h2>💬 Stories From the Community</h2><div class="rule"></div></div>
+            <div class="msgbox-grid">
+              <div class="window msgbox">
+                <div class="title-bar"><div class="title-bar-text">Testimonial.txt</div>
+                  <div class="title-bar-controls"><button aria-label="Close"></button></div>
+                </div>
+                <div class="window-body">
+                  <div class="msg-row">
+                    <div class="msg-icon">ℹ️</div>
+                    <div>
+                      <p>"I planned to stay two nights in Ubud. I stayed a week because Ayu's family made me feel like one of their own."</p>
+                      <p class="text-muted msg-author">— Jonas R., Traveler, Germany</p>
+                    </div>
+                  </div>
+                  <div class="msg-actions"><button class="default">OK</button></div>
+                </div>
+              </div>
+
+              <div class="window msgbox">
+                <div class="title-bar"><div class="title-bar-text">Testimonial.txt</div>
+                  <div class="title-bar-controls"><button aria-label="Close"></button></div>
+                </div>
+                <div class="window-body">
+                  <div class="msg-row">
+                    <div class="msg-icon">ℹ️</div>
+                    <div>
+                      <p>"Hosting through NomadNest introduced me to people from six continents without ever leaving Accra."</p>
+                      <p class="text-muted msg-author">— Kwame A., Host, Ghana</p>
+                    </div>
+                  </div>
+                  <div class="msg-actions"><button class="default">OK</button></div>
+                </div>
+              </div>
+
+              <div class="window msgbox">
+                <div class="title-bar"><div class="title-bar-text">Testimonial.txt</div>
+                  <div class="title-bar-controls"><button aria-label="Close"></button></div>
+                </div>
+                <div class="window-body">
+                  <div class="msg-row">
+                    <div class="msg-icon">ℹ️</div>
+                    <div>
+                      <p>"Verification and reviews made it easy to trust a stranger's home. Now that stranger is a friend for life."</p>
+                      <p class="text-muted msg-author">— Mira T., Traveler, Canada</p>
+                    </div>
+                  </div>
+                  <div class="msg-actions"><button class="default">OK</button></div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- FINAL CTA -->
+          <section class="win-section center">
+            <div class="window">
+              <div class="title-bar">
+                <div class="title-bar-text">Ready to Connect?</div>
+                <div class="title-bar-controls"><button aria-label="Close"></button></div>
+              </div>
+              <div class="window-body">
+                <h1 style="font-size:16px;">Your next local connection is waiting.</h1>
+                <p>Join thousands of travelers experiencing the world through community, not tourism.</p>
+                <div class="btn-row">
+                  <button class="default">Explore Hosts</button>
+                  <button>Become a Host</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- FOOTER / SITE MAP -->
+          <section class="win-section" id="footer-nav">
+            <fieldset>
+              <legend>🗂 Site Map</legend>
+              <div class="sitemap-grid">
+                <div>
+                  <b><u>E</u>xplore</b>
+                  <ul>
+                    <li><a href="#hosts">Popular Destinations</a></li>
+                    <li><a href="#hosts">Featured Hosts</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <b><u>C</u>ommunity</b>
+                  <ul>
+                    <li><a href="#search">Become a Host</a></li>
+                    <li><a href="#stories">Community Stories</a></li>
+                    <li><a href="#">Guidelines</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <b>Trust &amp; <u>S</u>afety</b>
+                  <ul>
+                    <li><a href="#safety">Safety Center</a></li>
+                    <li><a href="#safety">Verification</a></li>
+                    <li><a href="#">Report a Concern</a></li>
+                  </ul>
+                </div>
+                <div>
+                  <b>Su<u>p</u>port</b>
+                  <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact Us</a></li>
+                    <li><a href="#">FAQs</a></li>
+                  </ul>
+                </div>
+              </div>
+              <p class="text-muted legal-line">© 2026 NomadNest, Inc. · 🌐 English (US) · Instagram · X · Facebook</p>
+            </fieldset>
+          </section>
+
+        </div>
+      </div>
+
+      <div class="status-bar app-status">
+        <p class="status-bar-field">Done</p>
+        <p class="status-bar-field">🔒 Secure Zone</p>
+        <p class="status-bar-field">Internet</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ START MENU (Start Menu + Cascading Submenus) ============ -->
+  <div class="start-menu" id="start-menu">
+    <div class="start-menu-sidebar"><span>NomadNest 95</span></div>
+    <ul class="start-menu-list">
+      <li><a href="#hero">🏡 Welcome</a></li>
+      <li><a href="#search">🔍 Explore Hosts</a></li>
+      <li><a href="#search">🛎 Become a Host</a></li>
+      <li class="has-submenu">
+        📁 Programs <span class="arrow">▶</span>
+        <ul class="submenu">
+          <li><a href="#hosts">Featured Hosts</a></li>
+          <li><a href="#how-it-works">How It Works</a></li>
+          <li><a href="#safety">Trust &amp; Safety</a></li>
+          <li><a href="#stories">Community Stories</a></li>
+        </ul>
+      </li>
+      <li><a href="#footer-nav">📄 Site Map</a></li>
+      <li class="divider"></li>
+      <li><a href="#">❓ Help</a></li>
+      <li><a href="#">🔌 Shut Down…</a></li>
+    </ul>
+  </div>
+
+  <!-- ============ TASKBAR ============ -->
+  <div class="taskbar">
+    <button class="start-button" id="start-button">🪟 Start</button>
+    <div class="taskbar-sep"></div>
+    <button class="task-button active">🏡 NomadNest.exe</button>
+    <div class="tray">
+      <span>🔊</span>
+      <span>🖧</span>
+      <span class="clock" id="clock">12:00 PM</span>
+    </div>
+  </div>
+
+<script>
+  // Start Menu toggle (Start Menu + Cascading Submenus, per design2.md)
+  var startBtn = document.getElementById('start-button');
+  var startMenu = document.getElementById('start-menu');
+
+  startBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    startMenu.classList.toggle('open');
+    startBtn.classList.toggle('active');
+  });
+
+  document.addEventListener('click', function(e){
+    if(!startMenu.contains(e.target) && e.target !== startBtn){
+      startMenu.classList.remove('open');
+      startBtn.classList.remove('active');
+    }
+  });
+
+  // Anchor links inside the scrollable app-body / start menu / dropdowns
+  var appBody = document.getElementById('app-body');
+  document.querySelectorAll('a[href^="#"]').forEach(function(a){
+    a.addEventListener('click', function(e){
+      var id = a.getAttribute('href');
+      if(id.length > 1){
+        var target = document.querySelector(id);
+        if(target){
+          e.preventDefault();
+          target.scrollIntoView({ behavior:'smooth', block:'start' });
+        }
+      }
+      startMenu.classList.remove('open');
+      startBtn.classList.remove('active');
+    });
+  });
+
+  // Taskbar clock
+  function tick(){
+    var d = new Date();
+    var h = d.getHours() % 12 || 12;
+    var m = String(d.getMinutes()).padStart(2,'0');
+    var ampm = d.getHours() >= 12 ? 'PM' : 'AM';
+    document.getElementById('clock').textContent = h + ':' + m + ' ' + ampm;
+  }
+  tick();
+  setInterval(tick, 15000);
+</script>
+
+</body>
+</html>

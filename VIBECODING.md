@@ -100,3 +100,39 @@ A UI/UX designer workflow for creating designs and code by teaming up with AI us
 
 - **Design System Template:** [design2.md](./design2.md) - Shows color, typography, spacing, components
 - **Design Brief Template:** [designbrief.md](./designbrief.md) - Project overview, flows, users, constraints, goals
+
+---
+
+## Results (All One-Shot Prompts)
+
+These are working examples from each flow. All created with single prompts—no fine-tuning, no iterations. Just AI understanding the reference and creating the code.
+
+### Flow 1: Internet Reference
+**Result:** NomadNest 95 Landing Page  
+**Based on:** Windows 95 design aesthetic from Dribbble/Pinterest  
+→ [View Result](./index2.html)  
+*Single prompt extracted the design vibe and generated the full HTML*
+
+### Flow 2: Design System Reference  
+**Result:** NomadNest Landing Page (Airbnb Design System)  
+**Based on:** Airbnb's design system from [getdesign.md](https://getdesign.md)  
+→ [View Result](./index.html)  
+*AI applied Airbnb's design tokens and patterns to create the landing page*
+
+### Flow 3: Live Product Code Reference
+**Result:** Share Checkout Link Component (Vue)  
+**Based on:** Existing live product code patterns  
+→ [View Code](./share.vue)  
+*AI learned the existing code style and created a new component that matches*
+
+### Flow 4: Figma Reference
+**Result:** Onboarding Mobile Screen  
+**Based on:** Figma design using Talk to Figma MCP  
+→ [View Result](./index3.html)  
+*AI read Figma designs and generated the interactive HTML*
+
+---
+
+## The Takeaway
+
+One good reference = one good prompt = working output. No need for multiple iterations or fine-tuning. The skill is knowing *what* to show the AI, not having to explain it in 100 words.
