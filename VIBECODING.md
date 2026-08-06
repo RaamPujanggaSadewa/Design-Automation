@@ -61,7 +61,16 @@ A UI/UX designer workflow for creating designs and code by teaming up with AI us
 5. Tell AI to create something new while keeping the same style and code patterns
 6. AI creates the design/code that matches your existing product's vibe
 
-**The Magic:** AI already knows how your product works, so it can create things that actually fit.
+**Handoff to Developers:**
+7. Push the new component to a **feature branch** (not main)
+8. Tell the developers: "I pushed [component name] to branch [branch name]"
+9. Explain what the component does:
+   - What is it? (e.g., "Share checkout link popup")
+   - When does it appear? (e.g., "Opens when user clicks share button")
+   - What can users do in it? (e.g., "Copy link to clipboard")
+10. This way developers know exactly what you created and why
+
+**The Magic:** AI already knows how your product works, so it can create things that actually fit. Then developers see your work in context.
 
 ---
 
