@@ -107,6 +107,45 @@
   footer { margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line); display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; font: 13px var(--mono); color: var(--muted); }
   footer a { color: var(--ink); }
 
+
+  /* Coming soon: the FLIK rebrand, designed only in code. Visuals stay redacted until launch. */
+  .soon { position: relative; background: var(--card); border-radius: 24px; overflow: hidden; box-shadow: 0 0 0 1.5px var(--ink), 0 14px 32px rgba(0,0,0,.12); }
+  .tape { display: flex; overflow: hidden; white-space: nowrap; background: var(--yellow); border-bottom: 1.5px solid var(--ink); font: 700 12px/30px var(--mono); letter-spacing: .12em; }
+  .tape span { padding-right: 2em; animation: tape 22s linear infinite; }
+  @keyframes tape { to { transform: translateX(-100%); } }
+  .soon-in { display: grid; grid-template-columns: 1.05fr 1fr; gap: 28px; padding: clamp(20px, 3.5vw, 36px); }
+  .soon-tags { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .soon-tags .live { display: inline-flex; align-items: center; gap: 7px; font: 600 12px var(--mono); color: var(--muted); }
+  .soon-tags .live::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--red); animation: pulse 1.6s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .25; } }
+  .soon h3 { font-size: clamp(26px, 3.6vw, 38px); line-height: 1.08; letter-spacing: -.025em; font-weight: 600; margin: 14px 0 12px; }
+  .soon h3 s { text-decoration-color: var(--red); text-decoration-thickness: 4px; color: var(--muted); }
+  .soon .lead { margin: 0 0 18px; color: #333; }
+  .scope { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+  .scope li { display: grid; grid-template-columns: 34px 1fr; gap: 10px; align-items: start; padding: 10px 12px; border-radius: 12px; background: var(--mat); transition: transform .35s cubic-bezier(.34,1.56,.64,1), background .2s; }
+  .scope li:hover { transform: translateX(6px); background: #fff3b0; }
+  .scope .ico { font-size: 20px; line-height: 1.3; }
+  .scope b { display: block; font-size: 16px; }
+  .scope small { display: block; color: var(--muted); font-size: 14px; line-height: 1.4; }
+  .vault { position: relative; align-self: stretch; min-height: 340px; border-radius: 16px; border: 1.5px solid var(--ink); background: #fafafa; overflow: hidden; }
+  .vault .chrome { height: 28px; border-bottom: 1.5px solid var(--ink); display: flex; gap: 6px; align-items: center; padding-left: 10px; background: #fff; }
+  .vault .chrome i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--ink); }
+  .vault .mock { padding: 16px; display: grid; gap: 10px; filter: blur(5px); opacity: .75; }
+  .vault .row { display: flex; gap: 10px; }
+  .vault .b { height: 14px; border-radius: 6px; background: #1a1a1a; }
+  .vault .c { flex: 1; height: 86px; border-radius: 12px; background: linear-gradient(135deg, #ff5b4d, #ffb199); }
+  .vault .c:nth-child(2) { background: linear-gradient(135deg, #1b1b1b, #5a5a5a); }
+  .vault .c:nth-child(3) { background: linear-gradient(135deg, #ffd60a, #ffe98a); }
+  .vault .seal { position: absolute; left: 50%; top: 56%; transform: translate(-50%, -50%) rotate(-8deg); background: #fff; border: 3px solid var(--red); color: var(--red); border-radius: 14px; padding: 10px 18px; text-align: center; font: 800 20px/1.15 var(--mono); letter-spacing: .06em; box-shadow: 0 0 0 6px #fff, 0 12px 26px rgba(0,0,0,.16); transition: transform .45s cubic-bezier(.34,1.56,.64,1); }
+  .vault .seal small { display: block; font: 600 11px var(--mono); letter-spacing: .04em; color: var(--ink); margin-top: 4px; }
+  .soon:hover .vault .seal { transform: translate(-50%, -50%) rotate(-2deg) scale(1.05); }
+  .vault .tape-x { position: absolute; left: -10%; right: -10%; height: 26px; background: var(--yellow); border-block: 1.5px solid var(--ink); font: 700 11px/23px var(--mono); letter-spacing: .14em; text-align: center; overflow: hidden; white-space: nowrap; }
+  .vault .t1 { top: 22%; transform: rotate(-6deg); }
+  .vault .t2 { bottom: 14%; transform: rotate(4deg); }
+  .soon-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 12px; padding: 16px clamp(20px, 3.5vw, 36px); border-top: 1.5px solid var(--ink); background: var(--mat); }
+  .soon-foot p { margin: 0; font-size: 15px; color: #333; max-width: 46em; }
+  .soon-foot a { font: 600 13px var(--mono); color: #fff; background: var(--ink); padding: 9px 15px; border-radius: 999px; text-decoration: none; white-space: nowrap; transition: background .15s; }
+  .soon-foot a:hover { background: var(--red); }
   @media (max-width: 820px) {
     .stamp { position: static; display: inline-block; margin-top: 22px; }
     .recipe { grid-template-columns: 1fr; }
@@ -116,9 +155,12 @@
     .takeaway { grid-template-columns: 1fr; }
     .takeaway .eq { text-align: left; }
     .bar nav .text { display: none; }
+    .soon-in { grid-template-columns: 1fr; }
+    .vault { min-height: 260px; }
   }
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { transition: none !important; animation: none !important; }
+    .tape span { transform: none; }
     h1 .mark path { stroke-dashoffset: 0; }
   }
 </style>
@@ -209,6 +251,46 @@
         </div>
       </a>
     </div>
+  </section>
+
+  <section aria-labelledby="next">
+    <h2 id="next">Next: a full rebrand, designed only in code</h2>
+    <p class="sub">My biggest test of this way of working is happening right now, at my current company.</p>
+    <article class="soon">
+      <div class="tape" aria-hidden="true"><span>WORK IN PROGRESS · UNDER WRAPS UNTIL LAUNCH · WORK IN PROGRESS · UNDER WRAPS UNTIL LAUNCH · </span><span>WORK IN PROGRESS · UNDER WRAPS UNTIL LAUNCH · WORK IN PROGRESS · UNDER WRAPS UNTIL LAUNCH · </span></div>
+      <div class="soon-in">
+        <div>
+          <div class="soon-tags"><span class="tag">Coming soon · FLIK</span><span class="live">In progress</span></div>
+          <h3>Rebranding a product without opening <s>Figma</s> a design tool.</h3>
+          <p class="lead">I'm leading a full rebrand of FLIK, a checkout and payments platform, and designing every part of it in code with Claude Code. No mockups to hand off: each decision is made in the real product.</p>
+          <ul class="scope">
+            <li><span class="ico" aria-hidden="true">🎨</span><span><b>A new brand foundation</b><small>Starting from colour, the base everything else is built on.</small></span></li>
+            <li><span class="ico" aria-hidden="true">🛬</span><span><b>A landing page from scratch</b><small>The first thing merchants see, rebuilt end to end.</small></span></li>
+            <li><span class="ico" aria-hidden="true">📊</span><span><b>The merchant dashboard, rebuilt</b><small>Starting from the existing spec, then broadened and improved.</small></span></li>
+            <li><span class="ico" aria-hidden="true">🧩</span><span><b>One design system for every developer</b><small>Shared by the merchant-facing product and the internal dashboard, so both are built from the same components.</small></span></li>
+          </ul>
+        </div>
+        <div class="vault" role="img" aria-label="The rebrand's screens, hidden until launch">
+          <div class="chrome"><i></i><i></i><i></i></div>
+          <div class="mock" aria-hidden="true">
+            <div class="b" style="width:38%"></div>
+            <div class="b" style="width:72%;height:28px"></div>
+            <div class="b" style="width:56%;opacity:.5"></div>
+            <div class="row"><div class="c"></div><div class="c"></div><div class="c"></div></div>
+            <div class="row"><div class="b" style="width:30%;height:34px;border-radius:999px"></div><div class="b" style="width:22%;height:34px;border-radius:999px;opacity:.35"></div></div>
+            <div class="b" style="width:90%;opacity:.3"></div>
+            <div class="b" style="width:80%;opacity:.3"></div>
+          </div>
+          <div class="tape-x t1" aria-hidden="true">DO NOT OPEN · DO NOT OPEN · DO NOT OPEN · DO NOT OPEN</div>
+          <div class="tape-x t2" aria-hidden="true">NDA · COMING SOON · NDA · COMING SOON · NDA</div>
+          <div class="seal" aria-hidden="true">COMING SOON<small>shared here after launch</small></div>
+        </div>
+      </div>
+      <div class="soon-foot">
+        <p><b>Why it matters:</b> when the design system lives in code, developers reuse the exact components I design. There's no gap between the design and what ships.</p>
+        <a href="https://calendly.com/raamps3/30min">Ask me about it ↗</a>
+      </div>
+    </article>
   </section>
 
   <section aria-label="The takeaway">
