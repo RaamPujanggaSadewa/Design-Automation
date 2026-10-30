@@ -119,13 +119,13 @@ These are working examples from each flow. All created with single prompts—no 
 ### Flow 1: Internet Reference
 **Result:** NomadNest 95 Landing Page  
 **Based on:** Windows 95 design aesthetic from Dribbble/Pinterest  
-→ [View Result](./index2.html)  
+→ [View Result](./nomadnest-95.html)  
 *Single prompt extracted the design vibe and generated the full HTML*
 
 ### Flow 2: Design System Reference  
 **Result:** NomadNest Landing Page (Airbnb Design System)  
 **Based on:** Airbnb's design system from [getdesign.md](https://getdesign.md)  
-→ [View Result](./index.html)  
+→ [View Result](./nomadnest.html)  
 *AI applied Airbnb's design tokens and patterns to create the landing page*
 
 ### Flow 3: Live Product Code Reference
@@ -137,7 +137,7 @@ These are working examples from each flow. All created with single prompts—no 
 ### Flow 4: Figma Reference
 **Result:** Onboarding Mobile Screen  
 **Based on:** Figma design using Talk to Figma MCP  
-→ [View Result](./index3.html)  
+→ [View Result](./onboarding.html)  
 *AI read Figma designs and generated the interactive HTML*
 
 ---

@@ -1,5 +1,7 @@
 # Design Automation
 
+**Live demo:** https://raam-design-automation.vercel.app
+
 A UI/UX designer's workflow for creating designs and code with AI. Featuring **Vibecoding**—a methodology that uses different reference sources to guide AI-generated designs and code.
 
 ## What's Vibecoding?
@@ -27,10 +29,10 @@ All examples here are **single-shot results**—no fine-tuning, no iterations.
 
 | Flow | Reference | Result |
 |------|-----------|--------|
-| Internet | Design aesthetic | [NomadNest 95](./index2.html) – Landing page with Windows 95 vibe |
-| Design System | Airbnb system | [NomadNest](./index.html) – Landing page following Airbnb tokens |
+| Internet | Design aesthetic | [NomadNest 95](./nomadnest-95.html) – Landing page with Windows 95 vibe |
+| Design System | Airbnb system | [NomadNest](./nomadnest.html) – Landing page following Airbnb tokens |
 | Live Code | Existing patterns | [Share Component](./share.vue) – Vue modal component |
-| Figma | Design file | [Onboarding](./index3.html) – Mobile onboarding screen |
+| Figma | Design file | [Onboarding](./onboarding.html) – Mobile onboarding screen |
 
 ---
 
@@ -39,8 +41,8 @@ All examples here are **single-shot results**—no fine-tuning, no iterations.
 - **VIBECODING.md** – Full methodology guide with step-by-step flows
 - **design2.md** – Design system template (Windows Classic example)
 - **designbrief.md** – Design brief template (NomadNest example)
-- **index.html, index2.html, index3.html** – Working HTML results
-- **share.vue** – Working Vue component result
+- **nomadnest.html, nomadnest-95.html, onboarding.html** – Working HTML results
+- **share.vue** – Working Vue component result (live render in share.html)
 
 ---
 

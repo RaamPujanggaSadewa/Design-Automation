@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Share Checkout Link — Flow 3</title>
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script src="https://unpkg.com/vue@3.5.13/dist/vue.global.prod.js"></script>
+<style>body{font-family:Inter,system-ui,sans-serif}</style>
+</head>
+<body class="bg-[#f4f4f5] min-h-screen">
+<div id="app">
+  <div class="p-4 text-sm text-[#525252] max-w-xl mx-auto">
+    <a href="./" class="underline">← All flows</a>
+    <p class="mt-2">Live render of <a class="underline" href="https://github.com/RaamPujanggaSadewa/Design-Automation/blob/main/share.vue">share.vue</a> (Flow 3: Live Product Code Reference).</p>
+    <button v-if="!open" @click="open = true" class="mt-4 px-4 py-2 bg-[#1f1f54] text-white rounded-md font-medium">Bagikan</button>
+  </div>
+
+  <!-- Markup below mirrors share.vue's <template> -->
+  <div v-if="open" class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-0 bg-black/30" @click.self="onClose">
+    <div class="w-full max-w-[380px] bg-white border border-[#e5e5e5] rounded-2xl overflow-hidden shadow-lg max-h-[90vh] flex flex-col">
+      <div class="flex justify-between items-center px-6 py-5 pb-4 border-b border-[#e5e5e5]">
+        <h1 class="text-sm font-medium text-[#171717] leading-6">Bagikan Link Checkout</h1>
+        <button class="bg-transparent border-0 p-0 cursor-pointer flex items-center justify-center w-6 h-6 text-[#171717] transition-opacity hover:opacity-60" @click="onClose" aria-label="Tutup">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      <div class="px-6 py-5 flex flex-col gap-4 overflow-y-auto flex-1">
+        <div class="flex items-center bg-[#f9fafb] border border-[#e5e5e5] rounded-xl p-3 sm:p-4">
+          <input type="text" :value="checkoutUrl" readonly class="flex-1 bg-transparent text-sm font-normal text-[#171717] focus:outline-none truncate">
+          <button @click="copyLink" class="ml-auto flex-shrink-0 px-4 py-2 bg-[#1f1f54] text-white text-sm font-medium rounded-md transition-all hover:bg-[#171645] active:bg-[#0f0e32]">
+            {{ copied ? 'Disalin' : 'Salin' }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const { createApp, ref } = Vue
+createApp({
+  setup() {
+    const open = ref(true)
+    const copied = ref(false)
+    const checkoutUrl = ref('api.dev.useflik.com/shortener/3WLh6H')
+    const onClose = () => { open.value = false }
+    const copyLink = async () => {
+      try {
+        await navigator.clipboard.writeText(checkoutUrl.value)
+        copied.value = true
+        setTimeout(() => { copied.value = false }, 2000)
+      } catch (err) {
+        console.error('Failed to copy:', err)
+      }
+    }
+    return { open, copied, checkoutUrl, onClose, copyLink }
+  }
+}).mount('#app')
+</script>
+</body>
+</html>
